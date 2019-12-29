@@ -27,7 +27,7 @@ pipeline {
           // Codebase
           sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install'
           sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} npm run-script build'
-          sh 'rm -rf node_modules'
+          sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} rm -rf node_modules'
           sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install --prod'
           sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} node-prune'
 
@@ -58,7 +58,7 @@ pipeline {
           // Codebase
           sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install'
           sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} npm run-script build'
-          sh 'rm -rf node_modules'
+          sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} rm -rf node_modules'
           sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install --prod'
           sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} node-prune'
 
@@ -93,7 +93,7 @@ pipeline {
               // Codebase
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install'
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} npm run-script build'
-              sh 'rm -rf node_modules'
+              sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} rm -rf node_modules'
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install --prod'
               sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} node-prune'
 
@@ -128,7 +128,7 @@ pipeline {
               // Codebase
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install'
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} npm run-script build'
-              sh 'sudo rm -rf node_modules'
+              sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} rm -rf node_modules'
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install --prod'
 
               // Docker Build
@@ -162,7 +162,7 @@ pipeline {
               // Codebase
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install'
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} npm run-script build'
-              sh 'rm -rf node_modules'
+              sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} rm -rf node_modules'
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install --prod'
 
               // Docker Build
@@ -197,7 +197,7 @@ pipeline {
               // Codebase
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install'
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} npm run-script build'
-              sh 'rm -rf node_modules'
+              sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} rm -rf node_modules'
               sh 'docker run --rm -v $(pwd):/app -w /app ${BASE_IMAGE} yarn install --prod'
 
               // Docker Build
@@ -350,6 +350,10 @@ pipeline {
     failure {
       juxtapose event: 'failure'
       sh 'figlet "FAILURE"'
+    }
+    always {
+      sh 'echo Reverting ownership'
+      sh 'docker run --rm -v $(pwd):/data ${DOCKER_CI_TOOLS} chown -R $(id -u):$(id -g) /data'
     }
   }
 }
